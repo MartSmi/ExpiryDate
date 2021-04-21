@@ -1,0 +1,18 @@
+#:kivy 1.0
+<KivyCamera>:
+    frame_box: only_image
+    # Label:
+    #     text: 'My label before button press'
+    # GridLayout:
+    FloatLayout:
+        Image:
+            id: only_image
+        Button:
+            text: root.toggle_rec_text
+            on_release: root.toggle_recording()
+            size: 80, 60
+            pos: 700, 80
+            size_hint: None, None
+            pos_hint_x: None
+            pos_hint_y: None
+            # pos_hint: {"y":0.5, "right": 1}    

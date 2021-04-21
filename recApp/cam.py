@@ -1,14 +1,16 @@
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
-from kivy.uix.button import Button
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.properties import StringProperty, NumericProperty
+from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 
 import cv2
 import os
+
+import datetime
 
 # Standard Video Dimensions Sizes
 STD_DIMENSIONS = {
@@ -27,19 +29,19 @@ VIDEO_TYPE = {
 }
 
 
-class KivyCamera(BoxLayout):
-    filename = StringProperty('video.avi')
+class KivyCamera(FloatLayout):
+    recording = True
     frames_per_second = NumericProperty(10.0)
     video_resolution = StringProperty('720p')
+    frame_box = ObjectProperty()
+    toggle_rec_text = StringProperty('stop')
 
     def __init__(self, **kwargs):
         super(KivyCamera, self).__init__(**kwargs)
-        self.img1 = Image()
-        self.b1 = Button()
-        self.add_widget(self.img1)
-        # self.add_widget(self.b1)
+        self.filename = self.gen_filename()
+
         self.capture = cv2.VideoCapture(0)
-        self.out = cv2.VideoWriter(self.filename, self.get_video_type(
+        self.out = cv2.VideoWriter('videos/' + self.filename, self.get_video_type(
             self.filename), self.frames_per_second, self.get_dims(self.capture, self.video_resolution))
         Clock.schedule_interval(self.update, 1 / self.frames_per_second)
 
@@ -50,10 +52,12 @@ class KivyCamera(BoxLayout):
         texture = Texture.create(
             size=(frame.shape[1], frame.shape[0]), colorfmt="bgr")
         texture.blit_buffer(buf, colorfmt="bgr", bufferfmt="ubyte")
-        self.img1.texture = texture
+        self.frame_box.texture = texture
+        # self.canvas.ask_update()
 
     # Set resolution for the video capture
     # Function adapted from https://kirr.co/0l6qmh
+
     def change_resolution(self, cap, width, height):
         self.capture.set(3, width)
         self.capture.set(4, height)
@@ -74,6 +78,21 @@ class KivyCamera(BoxLayout):
             return VIDEO_TYPE[ext]
         return VIDEO_TYPE['avi']
 
+    def toggle_recording(self):
+        if self.recording:
+            Clock.unschedule(self.update)
+            self.toggle_rec_text = 'start'
+            self.out.release()
+        else:
+            self.filename = self.gen_filename()
+            self.out = cv2.VideoWriter('videos/' + self.filename, self.get_video_type(
+                self.filename), self.frames_per_second, self.get_dims(self.capture, self.video_resolution))
+            Clock.schedule_interval(self.update, 1 / self.frames_per_second)
+            self.toggle_rec_text = 'stop'
+        self.recording = not self.recording
+    
+    def gen_filename(self):
+        return datetime.datetime.now().strftime('%m-%d--%H-%M-%S.avi')
 
 class CamApp(App):
     def build(self):
