@@ -1,14 +1,27 @@
 #:kivy 1.0
 <KivyCamera>:
     frame_box: only_image
-    # Label:
-    #     text: 'My label before button press'
-    # GridLayout:
+    indicator: indicator
+    button: button
     FloatLayout:
         Image:
             id: only_image
+        Label:
+            pos: 565, 434
+            size: 20, 20
+            text: 'recording'
         Button:
+            id: indicator
+            background_color: (1, 0, 0, 1)
+            pos: 765, 434
+            size: 20, 20
+            size_hint: None, None
+            pos_hint_x: None
+            pos_hint_y: None
+        Button:
+            id: button
             text: root.toggle_rec_text
+            #on_touch_down: root.toggle_recording()
             on_release: root.toggle_recording()
             size: 80, 60
             pos: 700, 80
@@ -16,3 +29,26 @@
             pos_hint_x: None
             pos_hint_y: None
             #pos_hint: {"y":0.5, "right": 1}    
+#        Label:
+#            text: 'recording'
+#            text_size: self.size
+#            size_hint: .1,.1
+#            pos_hint: {"x":0.89, "top":0.97}
+#            pos: 600, 500
+#            size_hint: None, None
+#            pos_hint_x: None
+#            pos_hint_y: None
+        Circle:
+#        Widget:
+#            canvas:
+##                Color:
+##                    rgb: 1, 0, 0
+#                Ellipse:
+#                    pos: 400, 400
+#                    size: 20, 20
+        
+<Circle>:
+    canvas:
+#        Ellipse:
+#            pos: 765, 434
+#            size: 20, 20
